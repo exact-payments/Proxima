@@ -2,153 +2,168 @@
 
 module Proxima
 
-  def watch_array(array, &block)
+  def self.watch_array(array, &on_change)
+
+    array.instance_variable_set(:@on_change, on_change)
+
+    array.each do |obj|
+      Proxima.watch(obj, &on_change)
+    end
+
     class << array
 
-      def <<(obj, *args)
-        hook_change_hander(obj, &block)
-        super
-        block.call
+      def <<(*args)
+        result = super
+        args.each do |obj|
+          Proxima.watch(obj, &@on_change)
+        end
+        @on_change.call
+        result
       end
 
-      def []=(start, length, obj = nil)
-        obj = length unless obj
-        hook_change_hander(obj, &block)
-        super
-        block.call
+      def []=(*args)
+        result = super
+        Proxima.watch(args[2] || args[1], &@on_change)
+        @on_change.call
+        result
       end
 
       def clear
-        super
-        block.call
+        has_contents = self.length > 0
+        result = super
+        @on_change.call if has_contents
+        result
       end
 
       def collect!
-        prev = dup
-        super
-        block.call unless self == prev
+        prev = self.dup
+        result = super
+        @on_change.call unless self == prev
+        result
       end
 
       def compact!
-        prev = dup
-        super
-        block.call unless self == prev
+        prev_length = self.length
+        result = super
+        @on_change.call if result
+        result
       end
 
       def delete(value)
-        prev = dup
-        super
-        block.call unless self == prev
+        prev = self.dup
+        result = super
+        @on_change.call unless self == prev
+        result
       end
 
       def delete_at(index)
-        prev = dup
+        prev = self.dup
         super
-        block.call unless self == prev
+        @on_change.call unless self == prev
       end
 
       def delete_if
-        prev = dup
+        prev = self.dup
         super
-        block.call unless self == prev
+        @on_change.call unless self == prev
       end
 
       def drop(n = nil)
         super
-        block.call unless n == 0
+        @on_change.call unless n == 0
       end
 
       def drop_while
-        prev = dup
+        prev = self.dup
         super
-        block.call unless self == prev
+        @on_change.call unless self == prev
       end
 
       def fill
         super
-        block.call
+        @on_change.call
       end
 
       def flatten!(level = nil)
-        prev = dup
+        prev = self.dup
         super
-        block.call unless self == prev
+        @on_change.call unless self == prev
       end
 
       def replace(other_ary)
-        prev = dup
+        prev = self.dup
         super
-        block.call unless self == prev
+        @on_change.call unless self == prev
       end
 
       def insert(index, value)
-        prev = dup
-        hook_change_hander(value, &block)
+        prev = self.dup
+        Proxima.watch(value, &@on_change)
         super
-        block.call unless self == prev
+        @on_change.call unless self == prev
       end
 
       def pop(n = nil)
         super
-        block.call
+        @on_change.call
       end
 
       def push(*obj_ary)
         obj_ary.each do
-          hook_change_hander(value, &block)
+          Proxima.watch(value, &@on_change)
         end
         super
-        block.call
+        @on_change.call
       end
 
       def reject!
         super
-        block.call
+        @on_change.call
       end
 
       def reverse!
         super
-        block.call
+        @on_change.call
       end
 
       def rotate!(cnt=nil)
         super
-        block.call
+        @on_change.call
       end
 
       def select!
         super
-        block.call
+        @on_change.call
       end
 
       def shift(n = nil)
         super
-        block.call
+        @on_change.call
       end
 
       def shuffle!(random = nil)
         super
-        block.call
+        @on_change.call
       end
 
       def slice!(start, length = nil)
         super
-        block.call
+        @on_change.call
       end
 
       def sort!
         super
-        block.call
+        @on_change.call
       end
 
       def sort_by!
         super
-        block.call
+        @on_change.call
       end
 
       def uniq!
         super
-        block.call
+        @on_change.call
       end
     end
   end

@@ -2,7 +2,7 @@
 
 module Proxima
 
-  def watch_hash(hash, &block)
+  def self.watch_hash(hash, &block)
     class << hash
 
       def []=(key, value)
