@@ -118,32 +118,13 @@ describe Proxima do
 
     describe 'array.collect!' do
 
-      it 'causes watch_array to yield if the array changes' do
+      it 'causes watch_array to yield' do
         array = [1, 2]
         expect { |b|
           Proxima.watch_array(array, &b)
           array.collect! { |v| v + 1 }
           expect(array).to eql([2, 3])
         }.to yield_control
-      end
-
-      it 'causes watch_array to yield if the array changes using an enumerator' do
-        array = [1, 2]
-        expect { |b|
-          Proxima.watch_array(array, &b)
-          enum = array.collect!
-          enum.with_index { |v, i| v + i }
-          expect(array).to eql([1, 3])
-        }.to yield_control
-      end
-
-      it 'does not cause watch_array to yield if the array remains the same' do
-        array = [1, 2]
-        expect { |b|
-          Proxima.watch_array(array, &b)
-          array.collect! { |v| v }
-          expect(array).to eql([1, 2])
-        }.not_to yield_control
       end
     end
 
@@ -165,6 +146,50 @@ describe Proxima do
           Proxima.watch_array(array, &b)
           expect(array.compact!).to eql(nil)
           expect(array).to eql([1, 2])
+        }.not_to yield_control
+      end
+    end
+
+
+    describe 'array.delete' do
+
+      it 'causes watch_array to yield if the array changes' do
+        array = [1, 2, 3]
+        expect { |b|
+          Proxima.watch_array(array, &b)
+          expect(array.delete(2)).to eql(2)
+          expect(array).to eql([1, 3])
+        }.to yield_control
+      end
+
+      it 'does not cause watch_array to yield if the array remains the same' do
+        array = [1, 2]
+        expect { |b|
+          Proxima.watch_array(array, &b)
+          expect(array.compact!).to eql(nil)
+          expect(array).to eql([1, 2])
+        }.not_to yield_control
+      end
+    end
+
+
+    describe 'array.delete_at' do
+
+      it 'causes watch_array to yield if the array changes' do
+        array = [1, 2, 3]
+        expect { |b|
+          Proxima.watch_array(array, &b)
+          expect(array.delete_at(1)).to eql(2)
+          expect(array).to eql([1, 3])
+        }.to yield_control
+      end
+
+      it 'does not cause watch_array to yield if the array remains the same' do
+        array = [1, 2, 3]
+        expect { |b|
+          Proxima.watch_array(array, &b)
+          expect(array.delete_at(3)).to eql(nil)
+          expect(array).to eql([1, 2, 3])
         }.not_to yield_control
       end
     end

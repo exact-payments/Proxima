@@ -50,12 +50,12 @@ describe Proxima::Api do
       payload = { j: 1 }
 
       expect(RestClient::Request).to receive(:execute).with({
-        method:  'METHOD',
-        url:     'BASE_URL/PATH',
+        method: 'METHOD',
+        url:    'BASE_URL/PATH',
         headers: {
           'X-TEST-HEADER': 'test',
-          params: { q: 1 },
-          content_type: :json
+          params:          { q: 1 },
+          content_type:    :json
         },
         payload: payload.to_json
       }).and_yield
