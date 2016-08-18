@@ -87,7 +87,7 @@ module Proxima
     end
 
     def initialize(record = {})
-      self.new_record = !record.key?(:id)
+      self.new_record = true
       self.attributes = record
     end
 
@@ -125,8 +125,10 @@ module Proxima
         return true
       end
 
+      return true if self.persisted?
+
       options[:flatten] = true if options[:flatten] == nil
-      path     = self.class.update_path.call self.to_h
+      path     = self.class.update_by_id_path.call self.to_h
       payload  = { json: self.as_json(options) }
       response = self.class.api.put path, payload
 
@@ -145,7 +147,7 @@ module Proxima
     def destroy
       return false if new_record?
 
-      response = self.class.api.delete(self.class.delete_path.call(self.to_h))
+      response = self.class.api.delete(self.class.delete_by_id_path.call(self.to_h))
 
       return false unless response.code == 204
       self.persisted = true
@@ -154,7 +156,7 @@ module Proxima
     def restore
       return false if new_record?
 
-      response = self.class.api.post(self.class.restore_path.call(self.to_h))
+      response = self.class.api.post(self.class.restore_by_id_path.call(self.to_h))
 
       return false unless response.code == 204
       self.persisted = true

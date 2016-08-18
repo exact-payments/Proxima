@@ -9,6 +9,7 @@ describe Proxima::Model do
 
       base_uri -> (r) { "/account/#{r[:account_id]}/user" }
 
+      attribute :id,         '_id'
       attribute :name,       'name'
       attribute :account_id, 'account'
     end
@@ -39,14 +40,10 @@ describe Proxima::Model do
 
   describe '.new_record?' do
 
-    it 'returns true if the record contains an id' do
-      user = User.new id: 1, name: 'Robert'
-      expect(user.new_record?).to eql(false)
-    end
-
-    it 'returns false if the record does not contain an id' do
+    it 'returns the value of @new_record' do
       user = User.new name: 'Robert'
-      expect(user.new_record?).to eql(true)
+      user.instance_variable_set :@new_record, false
+      expect(user.new_record?).to eql(false)
     end
   end
 
@@ -55,7 +52,7 @@ describe Proxima::Model do
 
     it 'creates an instance from a record and saves it then returns the model' do
       mock_response = RestClient::Response.new(
-        '{ "name": "Robert", "account": 1 }'
+        '{ "_id": "1", "name": "Robert", "account": 1 }'
       )
       mock_response.instance_variable_set :@code, 201
 
@@ -65,7 +62,9 @@ describe Proxima::Model do
           .and_return(mock_response)
       )
 
-      expect(User.create name: 'Robert', account_id: 1).to be_a(User)
+      user = User.create name: 'Robert', account_id: 1
+      expect(user).to be_a(User)
+      expect(user.id).to eql('1')
     end
   end
 
@@ -179,20 +178,114 @@ describe Proxima::Model do
 
 
   describe '#initialize' do
-
-    it 'sets @new_record to false if the record contains an id' do
-      user = User.new id: 1, name: 'Robert'
-      expect(user.instance_variable_get(:@new_record)).to eql(false)
-    end
-
-    it 'sets @new_record to true if the record does not contain an id' do
+    it 'assigns the record to attributes and sets @new_record to true' do
+      expect_any_instance_of(User).to receive(:attributes=).with name: 'Robert'
       user = User.new name: 'Robert'
       expect(user.instance_variable_get(:@new_record)).to eql(true)
     end
   end
 
 
-  # describe '#persisted?' do
-  #
-  # end
+  describe '#persisted?' do
+
+    it 'returns the value of @persisted' do
+      user = User.new name: 'Robert'
+      user.instance_variable_set :@persisted, true
+      expect(user.persisted?).to equal(true)
+    end
+  end
+
+
+  describe '#persisted=' do
+
+    it 'sets @persisted to true and calls #changes_applied if assigned true' do
+      user = User.new name: 'Robert'
+      expect(user).to receive(:changes_applied)
+      user.persisted = true
+      expect(user.instance_variable_get(:@persisted)).to equal(true)
+    end
+
+    it 'sets @persisted to false assigned false' do
+      user = User.new name: 'Robert'
+      expect(user).not_to receive(:changes_applied)
+      user.persisted = false
+      expect(user.instance_variable_get(:@persisted)).to equal(false)
+    end
+  end
+
+
+  describe '#new_record?' do
+
+    it 'returns the value of @new_record' do
+      user = User.new name: 'Robert'
+      user.instance_variable_set :@new_record, true
+      expect(user.new_record?).to equal(true)
+    end
+  end
+
+
+  describe '#new_record=' do
+
+    it 'sets @new_record to true, @persisted to false if assigned true' do
+      user = User.new name: 'Robert'
+      expect(user).not_to receive(:clear_changes_information)
+      user.new_record = true
+      expect(user.instance_variable_get(:@new_record)).to equal(true)
+      expect(user.instance_variable_get(:@persisted)).to equal(false)
+    end
+
+    it 'sets @new_record to false, @persisted to true, and calls #clear_changes_information if assigned false' do
+      user = User.new name: 'Robert'
+      expect(user).to receive(:clear_changes_information)
+      user.new_record = false
+      expect(user.instance_variable_get(:@new_record)).to equal(false)
+      expect(user.instance_variable_get(:@persisted)).to equal(true)
+    end
+  end
+
+
+  describe '.save' do
+
+    it 'sends a post request to the api if the record is new and returns true' do
+      mock_response = RestClient::Response.new(
+        '{ "_id": "1", "name": "Robert", "account": 1 }'
+      )
+      mock_response.instance_variable_set :@code, 201
+
+      expect_any_instance_of(Proxima::Api).to(
+        receive(:post)
+          .with("/account/1/user", { json: { "name" => "Robert", "account" => 1 }})
+          .and_return(mock_response)
+      )
+
+      user = User.new name: 'Robert', account_id: 1
+      expect(user.save).to equal(true)
+    end
+
+    it 'sends a put request to the api if the record is new and returns true' do
+      mock_response = RestClient::Response.new(
+        '{ "_id": "1", "name": "Robert", "account": 1 }'
+      )
+      mock_response.instance_variable_set :@code, 204
+
+      expect_any_instance_of(Proxima::Api).to(
+        receive(:put)
+          .with("/account/1/user/1", { json: { "name" => "Marcus" }})
+          .and_return(mock_response)
+      )
+
+      user = User.new id: 1, name: 'Robert', account_id: 1
+      user.new_record = false
+      user.name       = 'Marcus'
+      expect(user.save).to equal(true)
+    end
+
+    it 'simply returns true without making a request if the document is already persisted' do
+      expect_any_instance_of(Proxima::Api).not_to receive(:put)
+
+      user = User.new id: 1, name: 'Robert', account_id: 1
+      user.new_record = false
+      expect(user.save).to equal(true)
+    end
+  end
 end
