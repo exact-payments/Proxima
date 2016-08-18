@@ -41,7 +41,7 @@ module Proxima
 
     def self.find(query, params = {})
       params[:query] = self.convert_query_or_delta_to_json query
-      response       = self.api.get self.find_path.call(q: query), params
+      response       = self.api.get self.find_path.call(query), params
 
       return [] unless response.code == 200
 

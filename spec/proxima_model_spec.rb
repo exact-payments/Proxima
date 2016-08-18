@@ -54,7 +54,9 @@ describe Proxima::Model do
   describe '.create' do
 
     it 'creates an instance from a record and saves it then returns the model' do
-      mock_response = RestClient::Response.new '{ "name": "Robert", "account": 1 }'
+      mock_response = RestClient::Response.new(
+        '{ "name": "Robert", "account": 1 }'
+      )
       mock_response.instance_variable_set :@code, 201
 
       expect_any_instance_of(Proxima::Api).to(
@@ -68,10 +70,39 @@ describe Proxima::Model do
   end
 
 
-  # describe '.find' do
-  #
-  #   it 'requests '
-  # end
+  describe '.find' do
+
+    it 'sends a query as a get request to the api and returns the results' do
+      mock_response = RestClient::Response.new(
+        '[{ "name": "Robert", "account": 1 }, ' +
+        '{ "name": "Brandyn", "account": 1 }]'
+      )
+      mock_response.instance_variable_set :@code, 200
+      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
+
+      expect_any_instance_of(Proxima::Api).to(
+        receive(:get)
+          .with("/account/1/user", {
+            headers: { :'X-TEST' => '1' },
+            query:   { 'account' => 1 }
+          })
+          .and_return(mock_response)
+      )
+      users = User.find(
+        { account_id: 1 },
+        { headers: { 'X-TEST': '1' } }
+      )
+
+      users.each do |user|
+        expect(user).to be_a(User)
+      end
+
+      expect(users[0].name).to eql('Robert')
+      expect(users[0].account_id).to equal(1)
+      expect(users[1].name).to eql('Brandyn')
+      expect(users[1].account_id).to equal(1)
+    end
+  end
 
 
   describe '#initialize' do
