@@ -39,9 +39,9 @@ module Proxima
       model
     end
 
-    def self.find(query, params = {})
-      params[:query] = self.convert_query_or_delta_to_json query
-      response       = self.api.get self.find_path.call(query), params
+    def self.find(query = {}, opts = {})
+      opts[:query] = self.convert_query_or_delta_to_json query
+      response     = self.api.get self.find_path.call(query), opts
 
       return [] unless response.code == 200
 
@@ -54,25 +54,29 @@ module Proxima
       end
     end
 
-    def self.find_one(query, params = {})
-      params['$limit'] = 1
-      self.find(query, params)[0]
+    def self.find_one(query = {}, opts = {})
+      query['$limit'] = 1;
+      self.find(query, opts)[0]
     end
 
-    def self.count(query)
-      params[:query]   = self.convert_query_or_delta_to_json query
-      params['$limit'] = 0
-      response         = self.api.get self.find_path.call(q: query), params
+    def self.count(query = {}, opts = {})
+      query['$limit'] = 0
+      opts[:query]    = self.convert_query_or_delta_to_json query
+      response        = self.api.get self.find_path.call(query), opts
 
       return nil unless response.code == 200
 
       response.headers[:x_total_count] || 0
     end
 
-    def self.find_by_id(id, params = {})
-      return nil unless id
+    def self.find_by_id(id, query = {}, opts = {})
+      if opts.empty? && query
+        opts  = query
+        query = {}
+      end
 
-      response = self.api.get self.find_by_id_path.call(id: id), params
+      query[:id] = id
+      response = self.api.get self.find_by_id_path.call(query), opts
 
       return nil unless response.code == 200
 

@@ -105,6 +105,79 @@ describe Proxima::Model do
   end
 
 
+  describe '.find_one' do
+
+    it 'sends a query as a get request to the api and returns the first result' do
+      mock_response = RestClient::Response.new '[{ "name": "Robert", "account": 1 }]'
+      mock_response.instance_variable_set :@code, 200
+      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
+
+      expect_any_instance_of(Proxima::Api).to(
+        receive(:get)
+          .with("/account/1/user", {
+            headers: { :'X-TEST' => '1' },
+            query:   { '$limit' => 1, 'account' => 1 }
+          })
+          .and_return(mock_response)
+      )
+      user = User.find_one(
+        { account_id: 1 },
+        { headers: { 'X-TEST': '1' } }
+      )
+
+      expect(user).to be_a(User)
+      expect(user.name).to eql('Robert')
+      expect(user.account_id).to equal(1)
+    end
+  end
+
+
+  describe '.count' do
+
+    it 'sends a query as a get request to the api and returns the total count' do
+      mock_response = RestClient::Response.new '[]'
+      mock_response.instance_variable_set :@code, 200
+      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
+
+      expect_any_instance_of(Proxima::Api).to(
+        receive(:get)
+          .with("/account/1/user", {
+            headers: { :'X-TEST' => '1' },
+            query:   { '$limit' => 0, 'account' => 1 }
+          })
+          .and_return(mock_response)
+      )
+      user_count = User.count(
+        { account_id: 1 },
+        { headers: { 'X-TEST': '1' } }
+      )
+
+      expect(user_count).to equal(5)
+    end
+  end
+
+
+  describe '.find_by_id' do
+
+    it 'sends a query as a get request to the api and returns the first result' do
+      mock_response = RestClient::Response.new '{ "name": "Robert", "account": 1 }'
+      mock_response.instance_variable_set :@code, 200
+      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
+
+      expect_any_instance_of(Proxima::Api).to(
+        receive(:get)
+          .with("/account/1/user/1", { headers: { :'X-TEST' => '1' } })
+          .and_return(mock_response)
+      )
+      user = User.find_by_id('1', { account_id: 1 }, { headers: { 'X-TEST': '1' } })
+
+      expect(user).to be_a(User)
+      expect(user.name).to eql('Robert')
+      expect(user.account_id).to equal(1)
+    end
+  end
+
+
   describe '#initialize' do
 
     it 'sets @new_record to false if the record contains an id' do
@@ -117,4 +190,9 @@ describe Proxima::Model do
       expect(user.instance_variable_get(:@new_record)).to eql(true)
     end
   end
+
+
+  # describe '#persisted?' do
+  #
+  # end
 end
