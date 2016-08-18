@@ -28,67 +28,55 @@ module Proxima
         result
       end
 
-      def clear
+      def clear(*args)
         result = super
         @on_change.call
         result
       end
 
-      def collect!
+      def collect!(*args)
         result = super
         @on_change.call
         result
       end
 
-      def compact!
+      def compact!(*args)
         result = super
         @on_change.call if result
         result
       end
 
-      def delete
+      def delete(*args)
         result = super
         @on_change.call if result
         result
       end
 
-      def delete_at
+      def delete_at(*args)
         result = super
         @on_change.call if result
         result
       end
 
-      def delete_if
+      def delete_if(*args)
         result = super
         @on_change.call
         result
       end
 
-      def drop(*args)
-        result = super
-        @on_change.call if args[0] > 0
-        result
-      end
-
-      def drop_while
+      def fill(*args)
         result = super
         @on_change.call
         result
       end
 
-      def fill
+      def flatten!(*args)
         result = super
         @on_change.call
         result
       end
 
-      def flatten!
-        result = super
-        @on_change.call
-        result
-      end
-
-      def replace
+      def replace(*args)
         result = super
         @on_change.call
         result
@@ -99,13 +87,13 @@ module Proxima
           Proxima.watch(value, &@on_change)
         end
         result = super
-        @on_change.call
+        @on_change.call if args[1] != nil
         result
       end
 
       def pop(*args)
         result = super
-        @on_change.call if args[0] > 0
+        @on_change.call if args[0] == nil || args[0] > 0
         result
       end
 
@@ -114,65 +102,69 @@ module Proxima
           Proxima.watch(value, &@on_change)
         end
         result = super
-        @on_change.call if args.length
+        @on_change.call if args.length > 0
         result
       end
 
-      def reject!
+      def reject!(*args)
         result = super
         @on_change.call if result
         result
       end
 
-      def reverse!
+      def reverse!(*args)
         result = super
         @on_change.call
         result
       end
 
-      def rotate!
+      def rotate!(*args)
         result = super
-        @on_change.call
+        @on_change.call if args[0] != 0
         result
       end
 
-      def select!
+      def select!(*args)
         result = super
-        @on_change.call
+        @on_change.call if result
         result
       end
 
       def shift(*args)
         result = super
-        @on_change.call if args[0] > 0
+        @on_change.call if args[0] == nil || args[0] > 0
         result
       end
 
-      def shuffle!
+      def shuffle!(*args)
         result = super
         @on_change.call
         result
       end
 
-      def slice!
+      def slice!(*args)
+        result = super
+        if result.is_a? Array
+          @on_change.call if result.length > 0
+        else
+          @on_change.call if result != nil
+        end
+        result
+      end
+
+      def sort!(*args)
         result = super
         @on_change.call
         result
       end
 
-      def sort!
+      def sort_by!(*args)
         result = super
         @on_change.call
         result
       end
 
-      def sort_by!
-        result = super
-        @on_change.call
-        result
-      end
-
-      def uniq!
+      def uniq!(*args)
         result = super
         @on_change.call if result
         result
