@@ -15,23 +15,23 @@ module Proxima
       def []=(*args)
         Proxima.watch(args[1], &@on_change)
         result = super
-        @on_change.call
+        @on_change.call if args[1]
         result
       end
 
-      def clear
+      def clear(*args)
         result = super
         @on_change.call
         result
       end
 
-      def delete
+      def delete(*args)
         result = super
         @on_change.call if result
         result
       end
 
-      def delete_if
+      def delete_if(*args)
         result = super
         @on_change.call
         result
@@ -46,13 +46,13 @@ module Proxima
         result
       end
 
-      def reject!
+      def reject!(*args)
         result = super
         @on_change.call if result
         result
       end
 
-      def select!
+      def select!(*args)
         result = super
         @on_change.call if result
         result
