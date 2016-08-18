@@ -27,19 +27,16 @@ module Proxima
     # extend  ActiveModel::Callbacks
     # define_model_callbacks :create, :update
 
-    def initialize(params = {})
-      self.new_record = !params.key?(:id)
-      self.attributes = params
-    end
-
     def self.api(api = nil)
       @api = api if api
       @api
     end
 
-    def self.create(params)
-      return params.map { |params| self.new params } if params.is_a? Array
-      self.new(params).save
+    def self.create(record)
+      return record.map { |record| self.new record } if record.is_a? Array
+      model = self.new(record)
+      return nil unless model.save
+      model
     end
 
     def self.find(query, params = {})
@@ -48,10 +45,10 @@ module Proxima
 
       return [] unless response.code == 200
 
-      params = ActiveSupport::JSON.decode response.body
-      params.map do |params|
+      records = ActiveSupport::JSON.decode response.body
+      records.map do |record|
         model = self.new
-        model.from_json params
+        model.from_json record
         model.new_record = false
         model
       end
@@ -59,7 +56,7 @@ module Proxima
 
     def self.find_one(query, params = {})
       params['$limit'] = 1
-      self.find query, params
+      self.find(query, params)[0]
     end
 
     def self.count(query)
@@ -85,6 +82,11 @@ module Proxima
       model
     end
 
+    def initialize(record = {})
+      self.new_record = !record.key?(:id)
+      self.attributes = record
+    end
+
     def persisted?
       @persisted
     end
@@ -101,7 +103,7 @@ module Proxima
     def new_record=(val)
       @new_record = !!val
       @persisted  = !val
-      self.clear_changes_information unless val
+      clear_changes_information unless val
     end
 
     def save(options = {})
