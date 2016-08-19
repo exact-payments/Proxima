@@ -26,4 +26,4 @@ Or install it yourself as:
 
 ## Usage
 
-To use proxima first create an initializer
+To use proxima first create an initializer. In the initializer create the Proxima::Api instances you need. One for each API you need to interact with. From there create your models using the APIs. Don't forget to set you base uri and attributes for each model.
