@@ -26,4 +26,62 @@ Or install it yourself as:
 
 ## Usage
 
-To use proxima first create an initializer. In the initializer create the Proxima::Api instances you need. One for each API you need to interact with. From there create your models using the APIs. Don't forget to set you base uri and attributes for each model.
+To use Proxima you must first declare your APIs. You may create as many as you like, but for this example we'll just add one for the GitHub API. You can do this in an initializer file.
+
+```ruby
+# file: config/initializers/proxima.rb
+
+GIT_HUB_API_V3 = Proxima::Api.new('https://api.github.com', {
+  headers: {
+    accept:        'application/vnd.github.v3+json'
+    authorization: 'token OAUTH-TOKEN'
+  }
+})
+```
+
+Now that we've created our `GIT_HUB_API_V3` we can use it to create models.
+
+```ruby
+# file: app/models/user_repo.rb
+
+class UserRepo < Proxima::Model
+
+    # First we must set our model's base uri
+    base_uri "/user/repos"
+    
+    #then add the attributes we are intrested in
+    attribute :id,               'id'
+    attribute :name,             'name'
+    attribute :full_name,        'full_name'
+    attribute :description,      'description'
+    attribute :private,          'private'
+    attribute :fork,             'fork'
+    attribute :url,              'url'
+    attribute :homepage,         'homepage'
+    attribute :forks_count,      'forks_count'
+    attribute :stargazers_count, 'stargazers_count'
+    attribute :watchers_count,   'watchers_count'
+    
+    # Note that any of the active model methods are avalible on proxima
+    # models so feel free to add things such as validation.
+    
+    def useful_stats
+        {
+            forks:      forks_count,
+            stargazers: stargazers_count,
+            watchers:   watchers_count
+        }
+    end
+end
+```
+
+These models can be used in your controllers once defined
+```ruby
+# file: app/controllers/user_repos_controller.rb
+
+class UserReposController < ApplicationController
+    def index
+        @repos = UserRepo.find()
+    end
+end
+```
