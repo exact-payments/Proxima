@@ -20,7 +20,7 @@ module Proxima
           value = default.respond_to?(:call) ? default.call(self, params) : default
         end
 
-        if attribute_params[:klass] && !value.is_a?(attribute_params[:klass])
+        if value != nil && attribute_params[:klass] && !value.is_a?(attribute_params[:klass])
           klass = attribute_params[:klass]
           value = klass.new value
         end

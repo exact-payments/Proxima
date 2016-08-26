@@ -33,7 +33,7 @@ module Proxima
     end
 
     def self.create(record)
-      return record.map { |record| self.new record } if record.is_a? Array
+      return record.map { |record| self.create record } if record.is_a? Array
       model = self.new(record)
       return nil unless model.save
       model
