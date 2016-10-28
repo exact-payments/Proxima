@@ -70,7 +70,7 @@ module Proxima
     end
 
     def self.find_by_id(id, query = {}, opts = {})
-      if opts.empty? && query
+      if opts == nil && query
         opts  = query
         query = {}
       end
