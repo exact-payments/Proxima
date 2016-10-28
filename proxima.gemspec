@@ -14,8 +14,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = "https://github.com/fintechdev/proxima"
   spec.license       = "MIT"
 
-  spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
+  spec.files         = Dir['lib/**/*.rb']
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "bundler", "~> 1.10"
