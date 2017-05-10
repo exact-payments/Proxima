@@ -101,14 +101,9 @@ module Proxima
       @response.headers[:x_total_count] || 0
     end
 
-    def self.find_by_id(id, params = {}, opts = nil)
-      if opts == nil
-        opts   = params
-        params = {}
-      end
-
+    def self.find_by_id(id, params = {}, opts = {})
       params[:id] = id
-      @response  = self.api.get self.find_by_id_path.call(params), opts
+      @response   = self.api.get self.find_by_id_path.call(params), opts
 
       return nil unless @response.code == 200
 
