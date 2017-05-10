@@ -60,9 +60,16 @@ module Proxima
       model
     end
 
-    def self.find(query = {}, opts = {})
+    def self.find(query = {}, params = {}, opts = nil)
+
+      # NOTE: This is a compatibility fix for 0.2 to 0.3
+      if opts == nil
+        opts   = params
+        params = query
+      end
+
       opts[:query] = self.convert_query_or_delta_to_json query
-      @response    = self.api.get self.find_path.call(query), opts
+      @response    = self.api.get self.find_path.call(params), opts
 
       if @response.code != 200
         return []
@@ -72,29 +79,36 @@ module Proxima
       models.each { |model| model.new_record = false }
     end
 
-    def self.find_one(query = {}, opts = {})
+    def self.find_one(query, params, opts = nil)
       query['$limit'] = 1
-      self.find(query, opts)[0]
+      self.find(query, params, opts)[0]
     end
 
-    def self.count(query = {}, opts = {})
+    def self.count(query = {}, params = {}, opts = nil)
+
+      # NOTE: This is a compatibility fix for 0.2 to 0.3
+      if opts == nil
+        opts   = params
+        params = query
+      end
+
       query['$limit'] = 0
       opts[:query]    = self.convert_query_or_delta_to_json query
-      @response       = self.api.get self.find_path.call(query), opts
+      @response       = self.api.get self.find_path.call(params), opts
 
       return nil unless @response.code == 200
 
       @response.headers[:x_total_count] || 0
     end
 
-    def self.find_by_id(id, query = {}, opts = {})
-      if opts == nil && query
-        opts  = query
-        query = {}
+    def self.find_by_id(id, params = {}, opts = nil)
+      if opts == nil
+        opts   = params
+        params = {}
       end
 
-      query[:id] = id
-      @response  = self.api.get self.find_by_id_path.call(query), opts
+      params[:id] = id
+      @response  = self.api.get self.find_by_id_path.call(params), opts
 
       return nil unless @response.code == 200
 
@@ -132,7 +146,7 @@ module Proxima
       @response
     end
 
-    def save(options = {})
+    def save(options = {}, params = {})
       return false unless self.valid?
 
       if self.new_record?
@@ -150,7 +164,7 @@ module Proxima
       return true if self.persisted?
 
       options[:flatten] = true if options[:flatten] == nil
-      path      = self.class.update_by_id_path.call self.to_h
+      path      = self.class.update_by_id_path.call params.merge(self.to_h)
       payload   = { json: self.as_json(options) }
       @response = self.class.api.put path, payload
 

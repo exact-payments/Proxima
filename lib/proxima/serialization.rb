@@ -20,8 +20,13 @@ module Proxima
 
         next unless value
 
-        if params[:klass] && params[:klass].respond_to?(:from_json)
-          value = params[:klass].from_json(value)
+        if params[:klass]
+          begin
+            value = Proxima.type_from_json params[:klass], value
+          rescue Exception => e
+            raise "Cannot convert value \"#{value}\" for attribute \"#{attribute}\" to type" +
+              " #{params[:klass].name}: #{e.message}"
+          end
         end
 
         hash[attribute] = value
@@ -42,7 +47,15 @@ module Proxima
 
         json_path = params[:json_path]
         value     = hash[attribute.to_s]
-        value     = value.as_json if value.respond_to? :as_json
+
+        if params[:klass]
+          begin
+            value = Proxima.type_to_json params[:klass], value
+          rescue Exception => e
+            raise "Cannot convert value \"#{value}\" for attribute \"#{attribute}\" from type" +
+              " #{params[:klass].name}: #{e.message}"
+          end
+        end
 
         if options.key? :flatten
           json[json_path] = value
