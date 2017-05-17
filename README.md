@@ -82,7 +82,7 @@ These models can be used in your controllers once defined
 
 class UserReposController < ApplicationController
     def index
-        @repos = UserRepo.find()
+        @repo_stats = UserRepo.find().map({ |u| u.useful_stats })
     end
 end
 ```
