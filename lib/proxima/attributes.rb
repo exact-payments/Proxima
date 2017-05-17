@@ -22,7 +22,7 @@ module Proxima
 
         if value != nil && attribute_params[:klass] && !value.is_a?(attribute_params[:klass])
           klass = attribute_params[:klass]
-          value = klass.new value
+          value = Proxima::type_from_json klass, value
         end
 
         self.send "#{attribute}=", value
