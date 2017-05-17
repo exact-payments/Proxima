@@ -50,17 +50,17 @@ class UserRepo < Proxima::Model
     base_uri "/user/repos"
     
     #then add the attributes we are intrested in
-    attribute :id,               'id'
-    attribute :name,             'name'
-    attribute :full_name,        'full_name'
-    attribute :description,      'description'
-    attribute :private,          'private'
-    attribute :fork,             'fork'
-    attribute :url,              'url'
-    attribute :homepage,         'homepage'
-    attribute :forks_count,      'forks_count'
-    attribute :stargazers_count, 'stargazers_count'
-    attribute :watchers_count,   'watchers_count'
+    attribute :id,               String,  'id'
+    attribute :name,             String,  'name'
+    attribute :full_name,        String,  'full_name'
+    attribute :description,      String,  'description'
+    attribute :private,          String,  'private'
+    attribute :fork,             String,  'fork'
+    attribute :url,              String,  'url'
+    attribute :homepage,         String,  'homepage'
+    attribute :forks_count,      Integer, 'forks_count'
+    attribute :stargazers_count, Integer, 'stargazers_count'
+    attribute :watchers_count,   Integer, 'watchers_count'
     
     # Note that any of the active model methods are avalible on proxima
     # models so feel free to add things such as validation.
