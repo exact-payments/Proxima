@@ -45,6 +45,7 @@ Now that we've created our `GIT_HUB_API_V3` we can use it to create models.
 # file: app/models/user_repo.rb
 
 class UserRepo < Proxima::Model
+    api GIT_HUB_API_V3
 
     # First we must set our model's base uri
     base_uri "/user/repos"
