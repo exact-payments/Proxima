@@ -67,9 +67,9 @@ class UserRepo < Proxima::Model
     
     def useful_stats
         {
-            forks:      forks_count,
-            stargazers: stargazers_count,
-            watchers:   watchers_count
+            forks:      self.forks_count,
+            stargazers: self.stargazers_count,
+            watchers:   self.watchers_count
         }
     end
 end
