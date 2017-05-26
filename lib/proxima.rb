@@ -63,11 +63,19 @@ module Proxima
 
   def self.type_from_json(klass, value)
     type = @types.find { |t| t[:klass] == klass }
-    type[:from_json].call(value) if type else value
+    if type
+      type[:from_json].call(value)
+    else
+      value
+    end
   end
 
   def self.type_to_json(klass, value)
     type = @types.find { |t| t[:klass] == klass }
-    type[:to_json].call(value) if type else value
+    if type
+      type[:to_json].call(value)
+    else
+      value
+    end
   end
 end

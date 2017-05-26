@@ -60,38 +60,29 @@ module Proxima
       model
     end
 
-    def self.find(query = {}, params = {}, opts = nil)
-
-      # NOTE: This is a compatibility fix for 0.2 to 0.3
-      if opts == nil
-        opts   = params
-        params = query
-      end
-
+    def self.find(query = {}, params = {}, opts = {})
       opts[:query] = self.convert_query_or_delta_to_json query
-      @response    = self.api.get self.find_path.call(params), opts
+      @response    = self.api.get self.find_path.call(params.merge(query)), opts
 
-      if @response.code != 200
-        return []
-      end
+      return [] unless @response.code == 200
 
       models = self.from_json @response.body
       models.each { |model| model.new_record = false }
     end
 
-    def self.find_one(query, params, opts = nil)
+    def self.count_and_find(query = {}, params = {}, opts = {})
+      items       = self.find query, params, opts
+      total_count = self.response.headers[:x_total_count].to_i || 0
+
+      Struct.new(:total_count, :items).new(total_count, items)
+    end
+
+    def self.find_one(query = {}, params = {}, opts = {})
       query['$limit'] = 1
       self.find(query, params, opts)[0]
     end
 
-    def self.count(query = {}, params = {}, opts = nil)
-
-      # NOTE: This is a compatibility fix for 0.2 to 0.3
-      if opts == nil
-        opts   = params
-        params = query
-      end
-
+    def self.count(query = {}, params = {}, opts = {})
       query['$limit'] = 0
       opts[:query]    = self.convert_query_or_delta_to_json query
       @response       = self.api.get self.find_path.call(params), opts
