@@ -29,6 +29,18 @@ module Proxima
       end
     end
 
+    def eql? otherModel
+      self.id.eql? otherModel.id
+    end
+
+    def hash
+      self.id.hash
+    end
+
+    def <=> otherModel
+      self.id <=> otherModel.id
+    end
+
     module ClassMethods
 
       def attributes

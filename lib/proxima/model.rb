@@ -1,5 +1,6 @@
 require 'active_model'
 require 'proxima/watch'
+require 'proxima/rest'
 require 'proxima/attributes'
 require 'proxima/paths'
 require 'proxima/serialization'
@@ -18,6 +19,7 @@ module Proxima
     include ActiveModel::Serializers::JSON
     include ActiveModel::Validations
 
+    include Proxima::Rest
     include Proxima::Attributes
     include Proxima::Paths
     include Proxima::Serialization
@@ -66,8 +68,7 @@ module Proxima
 
       return [] unless @response.code == 200
 
-      models = self.from_json @response.body
-      models.each { |model| model.new_record = false }
+      self.from_json @response.body
     end
 
     def self.count_and_find(query = {}, params = {}, opts = {})
@@ -98,10 +99,7 @@ module Proxima
 
       return nil unless @response.code == 200
 
-      model = self.new
-      model.from_json @response.body
-      model.new_record = false
-      model
+      self.from_json @response.body, single_model_from_array: true
     end
 
     def initialize(record = {})
@@ -167,7 +165,7 @@ module Proxima
     end
 
     def destroy
-      return false if new_record?
+      raise "Cannot destroy a new record" if new_record?
 
       @response = self.class.api.delete(self.class.delete_by_id_path.call(self.to_h))
 
@@ -176,7 +174,7 @@ module Proxima
     end
 
     def restore
-      return false if new_record?
+      raise "Cannot restore a new record" if new_record?
 
       @response = self.class.api.post(self.class.restore_by_id_path.call(self.to_h))
 

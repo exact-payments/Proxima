@@ -3,9 +3,11 @@
 module Proxima
   module Serialization
 
-    def from_json(json, include_root = self.include_root_in_json)
+    def from_json(json, opts = {})
       json = ActiveSupport::JSON.decode(json) if json.is_a?(String)
-      json = json.values.first if include_root
+      binding.pry
+      json = json.values.first if opts[:include_root] || self.include_root_in_json
+      json = json.first        if opts[:single_model_from_array] && json.is_a?(Array)
       hash = {}
 
       self.class.attributes.each do |attribute, params|
@@ -33,16 +35,18 @@ module Proxima
       end
 
       self.attributes = hash
+      self.new_record = opts[:new_record] if opts[:new_record] != nil
       self
     end
 
-    def as_json(options = {})
-      hash = serializable_hash options
+    def as_json(opts = {})
+      hash = self.serializable_hash opts
+
       json = {}
       self.class.attributes.each do |attribute, params|
         next if (
-          !options.key?(:include_clean) && !send("#{attribute}_changed?") ||
-          !options.key?(:include_nil) && hash[attribute.to_s] == nil
+          !opts.key?(:include_clean) && !send("#{attribute}_changed?") ||
+          !opts.key?(:include_nil)   && hash[attribute.to_s] == nil
         )
 
         json_path = params[:json_path]
@@ -57,7 +61,7 @@ module Proxima
           end
         end
 
-        if options.key? :flatten
+        if opts.key? :flatten
           json[json_path] = value
           next
         end
@@ -72,8 +76,8 @@ module Proxima
         json_ctx[last_json_path_chunk] = value
       end
 
-      root = if options.key? :root
-        options[:root]
+      root = if opts.key? :root
+        opts[:root]
       else
         self.include_root_in_json
       end
@@ -96,15 +100,19 @@ module Proxima
 
     module ClassMethods
 
-      def from_json(json, include_root=self.include_root_in_json)
+      def from_json(json, opts = {})
         json = ActiveSupport::JSON.decode(json) if json.is_a? String
-        json = json.values.first if include_root
+        json = json.values.first if opts[:include_root] || self.include_root_in_json
+        json = json.first        if opts[:single_model_from_array] && json.is_a?(Array)
 
         if json.is_a? Array
           return json.map { |json| self.new.from_json json }
         end
 
-        self.new.from_json json
+        model            = self.new.from_json json
+        model.new_record = opts[:new_record] || false
+
+        model
       end
 
       def convert_query_or_delta_to_json(query)
