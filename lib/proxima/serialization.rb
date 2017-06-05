@@ -5,7 +5,6 @@ module Proxima
 
     def from_json(json, opts = {})
       json = ActiveSupport::JSON.decode(json) if json.is_a?(String)
-      binding.pry
       json = json.values.first if opts[:include_root] || self.include_root_in_json
       json = json.first        if opts[:single_model_from_array] && json.is_a?(Array)
       hash = {}
