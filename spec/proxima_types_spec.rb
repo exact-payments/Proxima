@@ -5,7 +5,11 @@ describe Proxima do
 
   describe '.add_type' do
 
-    it 'registers a type to be used by Proxima'
+    it 'registers a type to be used by Proxima' do
+      class MyType; end;
+
+      Proxima.add_type MyType
+    end
   end
 
   describe '.remove_type' do

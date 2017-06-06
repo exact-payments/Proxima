@@ -32,5 +32,15 @@ module Proxima
     def http_version
       @raw_response.http_version
     end
+
+    def headers
+      @raw_response.each_header { |name, val| [from_header(name), val] }.to_h
+    end
+
+    private
+
+    def from_header header_name
+      header_name.downcase.gsub('-', '_').to_sym
+    end
   end
 end
