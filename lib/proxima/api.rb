@@ -4,8 +4,12 @@ module Proxima
 
     attr_reader :base_uri, :headers
 
-    def initialize(base_url, opts = {})
-      @base_uri = URI.parse base_url
+    def initialize(base_uri, opts = {})
+      begin
+        @base_uri = URI.parse base_uri
+      rescue => e
+        raise "'#{base_uri}' is not a valid base_uri: #{e.message}"
+      end
       @headers  = opts[:headers] || {}
     end
 
