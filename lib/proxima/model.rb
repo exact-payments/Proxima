@@ -122,26 +122,26 @@ module Proxima
       @response
     end
 
-    def save(options = {}, params = {})
+    def save(opts = {}, params = {})
       return false unless self.valid?
 
       if self.new_record?
         path      = self.class.create_path.call self.to_h
-        payload   = { json: self.as_json(options) }
+        payload   = { json: self.as_json(opts) }
         @response = self.class.api.post path, payload
 
         return false unless @response.code == 201
 
-        self.from_json @response.body, options[:include_root]
+        self.from_json @response.body, opts
         self.new_record = false
         return true
       end
 
       return true if self.persisted?
 
-      options[:flatten] = true if options[:flatten] == nil
+      opts[:flatten] = true if opts[:flatten] == nil
       path      = self.class.update_by_id_path.call params.merge(self.to_h)
-      payload   = { json: self.as_json(options) }
+      payload   = { json: self.as_json(opts) }
       @response = self.class.api.put path, payload
 
       return false unless @response.code == 204
