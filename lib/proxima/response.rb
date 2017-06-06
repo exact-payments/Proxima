@@ -7,6 +7,7 @@ module Proxima
     def initialize(request, raw_response)
       @request      = request
       @raw_response = raw_response
+      @headers      = nil
     end
 
     def json
@@ -34,7 +35,7 @@ module Proxima
     end
 
     def headers
-      @raw_response.each_header { |name, val| [from_header(name), val] }.to_h
+      @headers ||= @raw_response.each_header { |name, val| [from_header(name), val] }.to_h
     end
 
     private
