@@ -22,5 +22,4 @@ describe Proxima do
 
     it 'converts a value from a given type to it\'s json parsed form'
   end
-
 end
