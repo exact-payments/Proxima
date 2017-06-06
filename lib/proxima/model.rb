@@ -1,11 +1,3 @@
-require 'active_model'
-require 'proxima/watch'
-require 'proxima/rest'
-require 'proxima/attributes'
-require 'proxima/paths'
-require 'proxima/serialization'
-require 'proxima/validation'
-
 
 module Proxima
 
@@ -19,7 +11,7 @@ module Proxima
     include ActiveModel::Serializers::JSON
     include ActiveModel::Validations
 
-    include Proxima::Rest
+    include Proxima::HTTPMethods
     include Proxima::Attributes
     include Proxima::Paths
     include Proxima::Serialization

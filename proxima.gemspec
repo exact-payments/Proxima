@@ -22,5 +22,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.5"
 
   spec.add_dependency "activemodel", '~> 4.0', '>= 4.0.0'
-  spec.add_dependency "rest-client", '~> 2.0', '>= 2.0.0'
 end

@@ -51,6 +51,7 @@ describe Proxima::Model do
   describe '.create' do
 
     it 'creates an instance from a record and saves it then returns the model' do
+      pending
       mock_response = RestClient::Response.new(
         '{ "_id": "1", "name": "Robert", "account": 1 }'
       )
@@ -72,6 +73,7 @@ describe Proxima::Model do
   describe '.find' do
 
     it 'sends a query as a get request to the api and returns the results' do
+      pending
       mock_response = RestClient::Response.new(
         '[{ "name": "Robert", "account": 1 }, ' +
         '{ "name": "Brandyn", "account": 1 }]'
@@ -107,6 +109,7 @@ describe Proxima::Model do
   describe '.find_one' do
 
     it 'sends a query as a get request to the api and returns the first result' do
+      pending
       mock_response = RestClient::Response.new '[{ "name": "Robert", "account": 1 }]'
       mock_response.instance_variable_set :@code, 200
       mock_response.instance_variable_set :@headers, { x_total_count: 5 }
@@ -134,6 +137,7 @@ describe Proxima::Model do
   describe '.count' do
 
     it 'sends a query as a get request to the api and returns the total count' do
+      pending
       mock_response = RestClient::Response.new '[]'
       mock_response.instance_variable_set :@code, 200
       mock_response.instance_variable_set :@headers, { x_total_count: 5 }
@@ -159,6 +163,7 @@ describe Proxima::Model do
   describe '.find_by_id' do
 
     it 'sends a query as a get request to the api and returns the first result' do
+      pending
       mock_response = RestClient::Response.new '{ "name": "Robert", "account": 1 }'
       mock_response.instance_variable_set :@code, 200
       mock_response.instance_variable_set :@headers, { x_total_count: 5 }
@@ -247,6 +252,7 @@ describe Proxima::Model do
   describe '.save' do
 
     it 'sends a post request to the api if the record is new and returns true' do
+      pending
       mock_response = RestClient::Response.new(
         '{ "_id": "1", "name": "Robert", "account": 1 }'
       )
@@ -263,6 +269,7 @@ describe Proxima::Model do
     end
 
     it 'sends a put request to the api if the record is new and returns true' do
+      pending
       mock_response = RestClient::Response.new(
         '{ "_id": "1", "name": "Robert", "account": 1 }'
       )

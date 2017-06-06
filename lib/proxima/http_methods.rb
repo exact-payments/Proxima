@@ -2,9 +2,11 @@
 
 module Proxima
 
-  module Rest
+  HTTP_METHODS = [:head, :post, :get, :put, :delete]
 
-    [:post, :get, :put, :delete].each do |http_method|
+  module HTTPMethods
+
+    HTTP_METHODS.each do |http_method|
       define_method :"#{http_method}" do |path, opts = {}, &block|
         @response = self.class.api.public_send(:"#{http_method}", path, opts, &block)
         @response
@@ -13,7 +15,7 @@ module Proxima
 
     module ClassMethods
 
-      [:post, :get, :put, :delete].each do |http_method|
+      HTTP_METHODS.each do |http_method|
         define_method :"#{http_method}" do |path, opts = {}, &block|
           @response = self.api.public_send(:"#{http_method}", path, opts, &block)
           @response
