@@ -35,7 +35,7 @@ module Proxima
     end
 
     def headers
-      @headers ||= @raw_response.each_header { |name, val| [from_header(name), val] }.to_h
+      @headers ||= @raw_response.each.to_h.map { |name, val| [from_header(name), val] }.to_h
     end
 
     private
