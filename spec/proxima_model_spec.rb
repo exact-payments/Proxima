@@ -163,11 +163,7 @@ describe Proxima::Model do
   describe '.find_by_id' do
 
     it 'sends a query as a get request to the api and returns the first result' do
-      pending
-      mock_response = RestClient::Response.new '{ "name": "Robert", "account": 1 }'
-      mock_response.instance_variable_set :@code, 200
-      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
-
+      mock_response = double('response', body: '{ "name": "Robert", "account": 1 }', code: 200)
       expect_any_instance_of(Proxima::Api).to(
         receive(:get)
           .with("/account/1/user/1", { headers: { :'X-TEST' => '1' } })
@@ -178,6 +174,18 @@ describe Proxima::Model do
       expect(user).to be_a(User)
       expect(user.name).to eql('Robert')
       expect(user.account_id).to equal(1)
+    end
+
+    it 'returns nil when an id is not informed' do
+      expect_any_instance_of(Proxima::Api).not_to receive(:get)
+
+      expect {
+        User.find_by_id(nil, { account_id: 1 }, { headers: { 'X-TEST': '1' } })
+      }.to raise_error(RuntimeError, 'id cannot be blank')
+
+      expect {
+        User.find_by_id('', { account_id: 1 }, { headers: { 'X-TEST': '1' } })
+      }.to raise_error(RuntimeError, 'id cannot be blank')
     end
   end
 

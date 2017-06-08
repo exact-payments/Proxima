@@ -86,6 +86,7 @@ module Proxima
     end
 
     def self.find_by_id(id, params = {}, opts = {})
+      raise "id cannot be blank" if id.blank?
       params[:id] = id
       @response   = self.api.get self.find_by_id_path.call(params), opts
 
