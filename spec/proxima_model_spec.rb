@@ -179,13 +179,13 @@ describe Proxima::Model do
     it 'returns nil when an id is not informed' do
       expect_any_instance_of(Proxima::Api).not_to receive(:get)
 
-      expect(
+      expect {
         User.find_by_id(nil, { account_id: 1 }, { headers: { 'X-TEST': '1' } })
-      ).to be_nil
+      }.to raise_error(RuntimeError, 'id cannot be blank')
 
-      expect(
+      expect {
         User.find_by_id('', { account_id: 1 }, { headers: { 'X-TEST': '1' } })
-      ).to be_nil
+      }.to raise_error(RuntimeError, 'id cannot be blank')
     end
   end
 
