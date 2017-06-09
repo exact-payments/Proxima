@@ -34,20 +34,20 @@ module Proxima
       @responses || []
     end
 
-    def self.create(record)
+    def self.create(record, params = {}, opts = {})
       if record.is_a? Array
         models     = []
         @responses = []
         record.each do |record|
           model = self.create record
-          @responses.push(model.response)
+          @responses.push model.response
           models.push(model) if model
         end
         return models
       end
 
-      model     = self.new(record)
-      save_ok   = model.save
+      model     = self.new record
+      save_ok   = model.save params, opts
       @response = model.response
 
       return nil unless save_ok
@@ -123,11 +123,11 @@ module Proxima
       @response
     end
 
-    def save(opts = {}, params = {})
+    def save(params = {}, opts = {})
       return false unless self.valid?
 
       if self.new_record?
-        path      = self.class.create_path.call self.to_h
+        path      = self.class.create_path.call self.to_h.merge(params)
         payload   = { json: self.as_json(opts) }
         @response = self.class.api.post path, payload
 
@@ -141,7 +141,7 @@ module Proxima
       return true if self.persisted?
 
       opts[:flatten] = true if opts[:flatten] == nil
-      path      = self.class.update_by_id_path.call params.merge(self.to_h)
+      path      = self.class.update_by_id_path.call self.to_h.merge(params)
       payload   = { json: self.as_json(opts) }
       @response = self.class.api.put path, payload
 
