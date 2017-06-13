@@ -29,7 +29,7 @@ module Proxima
       query_str     = opts[:query] ? "?#{opts[:query].to_query}" : ''
       @uri          = URI.join @api.base_uri, path, query_str
       @http         = Net::HTTP.new @uri.host, @uri.port
-      @http.use_ssl = url.scheme == "https"
+      @http.use_ssl = @uri.scheme == "https"
     end
 
     def response
