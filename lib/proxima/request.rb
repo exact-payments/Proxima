@@ -25,10 +25,11 @@ module Proxima
 
       headers.merge! @api.headers
 
-      @headers  = headers.map{ |name, val| [to_header(name), val.to_s] }.to_h
-      query_str = opts[:query] ? "?#{opts[:query].to_query}" : ''
-      @uri      = URI.join @api.base_uri, path, query_str
-      @http     = Net::HTTP.new(@uri.host, @uri.port)
+      @headers      = headers.map{ |name, val| [to_header(name), val.to_s] }.to_h
+      query_str     = opts[:query] ? "?#{opts[:query].to_query}" : ''
+      @uri          = URI.join @api.base_uri, path, query_str
+      @http         = Net::HTTP.new @uri.host, @uri.port
+      @http.use_ssl = url.scheme == "https"
     end
 
     def response
