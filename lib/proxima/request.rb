@@ -30,7 +30,7 @@ module Proxima
       @uri              = URI.join @api.base_uri, path, query_str
       @http             = Net::HTTP.new @uri.host, @uri.port
       @http.use_ssl     = @uri.scheme == "https"
-      @http.verify_mode = OpenSSL::SSL::VERIFY_PEER if @http.use_ssl
+      @http.verify_mode = OpenSSL::SSL::VERIFY_PEER if @uri.scheme == "https"
     end
 
     def response
