@@ -19,22 +19,21 @@ module Proxima
         opts[:json].to_json
       elsif opts[:body]
         opts[:body]
-      else
-        ''
       end
 
       headers.merge! @api.headers
 
-      @headers          = headers.map{ |name, val| [to_header(name), val.to_s] }.to_h
-      query_str         = opts[:query] ? "?#{opts[:query].to_query}" : ''
-      @uri              = URI.join @api.base_uri, path, query_str
-      @http             = Net::HTTP.new @uri.host, @uri.port
-      @http.use_ssl     = @uri.scheme == "https"
-      @http.verify_mode = OpenSSL::SSL::VERIFY_PEER if @uri.scheme == "https"
+      @headers  = headers.map{ |name, val| [to_header(name), val.to_s] }.to_h
+      query_str = opts[:query] ? "?#{opts[:query].to_query}" : ''
+      @uri      = URI.join(@api.base_uri, path, query_str)
     end
 
     def response
-      raw_response = @http.send_request @method, @uri, @body, @headers
+      raw_response = HTTP
+        .use(:auto_deflate)
+        .headers(@headers)
+        .request @method, @uri, body: @body
+
       Response.new self, raw_response
     end
 

@@ -11,31 +11,23 @@ module Proxima
     end
 
     def json
-      begin
-        JSON.parse @raw_response.body if @raw_response.body
-      rescue => e
-        raise "Failed to parse response body as JSON string: #{e.message}"
-      end
+      @raw_response.parse 'application/json'
     end
 
     def body
-      @raw_response.body
+      @raw_response.body.to_s
     end
 
     def code
-      @raw_response.code.to_i
+      @raw_response.code
     end
 
     def message
-      @raw_response.message
-    end
-
-    def http_version
-      @raw_response.http_version
+      @raw_response.reason
     end
 
     def headers
-      @headers ||= @raw_response.each.to_h.map { |name, val| [from_header(name), val] }.to_h
+      @headers ||= @raw_response.headers.map{ |name, value| [from_header(name), value] }.to_h
     end
 
     private
