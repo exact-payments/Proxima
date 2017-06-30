@@ -21,5 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.5"
 
+  spec.add_dependency "http", "~> 2.2"
   spec.add_dependency "activemodel", '~> 4.0', '>= 4.0.0'
 end

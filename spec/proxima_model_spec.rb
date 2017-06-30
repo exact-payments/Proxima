@@ -51,11 +51,11 @@ describe Proxima::Model do
   describe '.create' do
 
     it 'creates an instance from a record and saves it then returns the model' do
-      pending
-      mock_response = RestClient::Response.new(
+      mock_response = double('Response')
+      expect(mock_response).to receive(:code).and_return 201
+      expect(mock_response).to receive(:body).and_return(
         '{ "_id": "1", "name": "Robert", "account": 1 }'
       )
-      mock_response.instance_variable_set :@code, 201
 
       expect_any_instance_of(Proxima::Api).to(
         receive(:post)
@@ -73,13 +73,12 @@ describe Proxima::Model do
   describe '.find' do
 
     it 'sends a query as a get request to the api and returns the results' do
-      pending
-      mock_response = RestClient::Response.new(
+      mock_response = double('Response')
+      expect(mock_response).to receive(:code).and_return 200
+      expect(mock_response).to receive(:body).and_return(
         '[{ "name": "Robert", "account": 1 }, ' +
         '{ "name": "Brandyn", "account": 1 }]'
       )
-      mock_response.instance_variable_set :@code, 200
-      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
 
       expect_any_instance_of(Proxima::Api).to(
         receive(:get)
@@ -91,6 +90,7 @@ describe Proxima::Model do
       )
       users = User.find(
         { account_id: 1 },
+        {},
         { headers: { 'X-TEST': '1' } }
       )
 
@@ -109,10 +109,9 @@ describe Proxima::Model do
   describe '.find_one' do
 
     it 'sends a query as a get request to the api and returns the first result' do
-      pending
-      mock_response = RestClient::Response.new '[{ "name": "Robert", "account": 1 }]'
-      mock_response.instance_variable_set :@code, 200
-      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
+      mock_response = double('Response')
+      expect(mock_response).to receive(:code).and_return 200
+      expect(mock_response).to receive(:body).and_return '[{ "name": "Robert", "account": 1 }]'
 
       expect_any_instance_of(Proxima::Api).to(
         receive(:get)
@@ -124,6 +123,7 @@ describe Proxima::Model do
       )
       user = User.find_one(
         { account_id: 1 },
+        {},
         { headers: { 'X-TEST': '1' } }
       )
 
@@ -137,20 +137,20 @@ describe Proxima::Model do
   describe '.count' do
 
     it 'sends a query as a get request to the api and returns the total count' do
-      pending
-      mock_response = RestClient::Response.new '[]'
-      mock_response.instance_variable_set :@code, 200
-      mock_response.instance_variable_set :@headers, { x_total_count: 5 }
+      mock_response = double('Response')
+      expect(mock_response).to receive(:code).and_return 200
+      expect(mock_response).to receive(:headers).and_return x_total_count: 5
 
       expect_any_instance_of(Proxima::Api).to(
         receive(:get)
           .with("/account/1/user", {
             headers: { :'X-TEST' => '1' },
-            query:   { '$limit' => 0, 'account' => 1 }
+            query:   { '$limit' => 0 }
           })
           .and_return(mock_response)
       )
       user_count = User.count(
+        {},
         { account_id: 1 },
         { headers: { 'X-TEST': '1' } }
       )
@@ -163,7 +163,10 @@ describe Proxima::Model do
   describe '.find_by_id' do
 
     it 'sends a query as a get request to the api and returns the first result' do
-      mock_response = double('response', body: '{ "name": "Robert", "account": 1 }', code: 200)
+      mock_response = double('Response')
+      expect(mock_response).to receive(:code).and_return 200
+      expect(mock_response).to receive(:body).and_return '{ "name": "Robert", "account": 1 }'
+
       expect_any_instance_of(Proxima::Api).to(
         receive(:get)
           .with("/account/1/user/1", { headers: { :'X-TEST' => '1' } })
@@ -260,11 +263,11 @@ describe Proxima::Model do
   describe '.save' do
 
     it 'sends a post request to the api if the record is new and returns true' do
-      pending
-      mock_response = RestClient::Response.new(
+      mock_response = double('Response')
+      expect(mock_response).to receive(:code).and_return 201
+      expect(mock_response).to receive(:body).and_return(
         '{ "_id": "1", "name": "Robert", "account": 1 }'
       )
-      mock_response.instance_variable_set :@code, 201
 
       expect_any_instance_of(Proxima::Api).to(
         receive(:post)
@@ -277,11 +280,8 @@ describe Proxima::Model do
     end
 
     it 'sends a put request to the api if the record is new and returns true' do
-      pending
-      mock_response = RestClient::Response.new(
-        '{ "_id": "1", "name": "Robert", "account": 1 }'
-      )
-      mock_response.instance_variable_set :@code, 204
+      mock_response = double('Response')
+      expect(mock_response).to receive(:code).and_return 204
 
       expect_any_instance_of(Proxima::Api).to(
         receive(:put)

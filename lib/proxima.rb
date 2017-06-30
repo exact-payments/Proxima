@@ -1,4 +1,4 @@
-require 'net/http'
+require 'http'
 require 'active_model'
 require 'proxima/version'
 require 'proxima/types'
