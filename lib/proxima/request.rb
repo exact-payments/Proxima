@@ -29,7 +29,7 @@ module Proxima
     end
 
     def response
-      raw_response = HTTP
+      raw_response = @api.http
         .use(:auto_deflate)
         .headers(@headers)
         .request @method, @uri, body: @body

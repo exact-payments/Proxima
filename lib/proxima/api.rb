@@ -2,11 +2,12 @@
 module Proxima
   class Api
 
-    attr_reader :base_uri, :headers
+    attr_reader :http, :base_uri, :headers
 
     def initialize(base_uri, opts = {})
       begin
         @base_uri = URI.parse base_uri
+        @http     = HTTP.persistent URI.join @base_uri, "/"
       rescue => e
         raise "'#{base_uri}' is not a valid base_uri: #{e.message}"
       end
