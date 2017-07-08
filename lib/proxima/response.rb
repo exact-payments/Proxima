@@ -8,6 +8,8 @@ module Proxima
       @request      = request
       @raw_response = raw_response
       @headers      = nil
+
+      @raw_response.flush
     end
 
     def json
