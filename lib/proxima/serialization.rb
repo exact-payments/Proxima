@@ -19,7 +19,7 @@ module Proxima
         end
         value = json_ctx
 
-        next unless value
+        next if value.nil?
 
         if params[:klass]
           begin
