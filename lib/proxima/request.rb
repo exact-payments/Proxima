@@ -32,7 +32,7 @@ module Proxima
       raw_response = @api.http
         .use(:auto_deflate)
         .headers(@headers)
-        .request @method, @uri, body: @body
+        .request @method, @uri, body: @body, ssl_context: @api.ssl_context
 
       Response.new self, raw_response
     end

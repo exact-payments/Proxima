@@ -2,7 +2,7 @@
 module Proxima
   class Api
 
-    attr_reader :http, :base_uri, :headers
+    attr_reader :http, :base_uri, :headers, :ssl_context
 
     def initialize(base_uri, opts = {})
       begin
@@ -11,7 +11,8 @@ module Proxima
       rescue => e
         raise "'#{base_uri}' is not a valid base_uri: #{e.message}"
       end
-      @headers  = opts[:headers] || {}
+      @headers     = opts[:headers]     || {}
+      @ssl_context = opts[:ssl_context] || {}
     end
 
     HTTP_METHODS.each do |http_method|
