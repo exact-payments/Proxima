@@ -11,8 +11,8 @@ module Proxima
       rescue => e
         raise "'#{base_uri}' is not a valid base_uri: #{e.message}"
       end
-      @headers     = opts[:headers]     || {}
-      @ssl_context = opts[:ssl_context] || {}
+      @headers     = opts[:headers] || {}
+      @ssl_context = opts[:ssl_context]
     end
 
     HTTP_METHODS.each do |http_method|
