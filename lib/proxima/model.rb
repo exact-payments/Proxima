@@ -82,7 +82,9 @@ module Proxima
 
       return nil unless @response.code == 200
 
-      @response.headers[:x_total_count] || 0
+      total_count = @response.headers[:x_total_count]
+
+      total_count.present? ? total_count.to_i : 0
     end
 
     def self.find_by_id(id, params = {}, opts = {})

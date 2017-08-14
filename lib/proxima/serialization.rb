@@ -51,6 +51,8 @@ module Proxima
         json_path = params[:json_path]
         value     = hash[attribute.to_s]
 
+        next if value.nil?
+
         if params[:klass]
           begin
             value = Proxima.type_to_json params[:klass], value

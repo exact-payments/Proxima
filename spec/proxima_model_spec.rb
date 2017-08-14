@@ -139,7 +139,7 @@ describe Proxima::Model do
     it 'sends a query as a get request to the api and returns the total count' do
       mock_response = double('Response')
       expect(mock_response).to receive(:code).and_return 200
-      expect(mock_response).to receive(:headers).and_return x_total_count: 5
+      expect(mock_response).to receive(:headers).and_return x_total_count: '5'
 
       expect_any_instance_of(Proxima::Api).to(
         receive(:get)
