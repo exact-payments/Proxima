@@ -159,19 +159,19 @@ module Proxima
       self.restore_attributes
     end
 
-    def destroy
+    def destroy(params = {})
       raise "Cannot destroy a new record" if new_record?
 
-      @response = self.class.api.delete(self.class.delete_by_id_path.call(self.to_h))
+      @response = self.class.api.delete(self.class.delete_by_id_path.call(self.to_h.merge(params)))
 
       return false unless @response.code == 204
       self.persisted = true
     end
 
-    def restore
+    def restore(params = {})
       raise "Cannot restore a new record" if new_record?
 
-      @response = self.class.api.post(self.class.restore_by_id_path.call(self.to_h))
+      @response = self.class.api.post(self.class.restore_by_id_path.call(self.to_h.merge(params)))
 
       return false unless @response.code == 204
       self.persisted = true
