@@ -107,7 +107,7 @@ module Proxima
         json = json.first        if opts[:single_model_from_array] && json.is_a?(Array)
 
         if json.is_a? Array
-          return json.map { |json| self.new.from_json json }
+          return json.map { |json|  self.from_json json }
         end
 
         model            = self.new.from_json json
