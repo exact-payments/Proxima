@@ -21,7 +21,7 @@ module Proxima
         opts[:body]
       end
 
-      headers.merge! @api.headers
+      headers = @api.headers.merge headers
 
       @headers  = headers.map{ |name, val| [to_header(name), val.to_s] }.to_h
       query_str = opts[:query] ? "?#{opts[:query].to_query}" : ''
